@@ -1,1 +1,1240 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scrum Ритуалы: Детектив возвращается!</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --scrum-blue: #1CB0F6;
+    --scrum-blue-dark: #0099D9;
+    --scrum-light: #E0F5FF;
+    --green: #58CC02;
+    --green-dark: #46A302;
+    --red: #FF4B4B;
+    --red-light: #FFE0E0;
+    --yellow: #FFD600;
+    --yellow-light: #FFF9C4;
+    --purple: #CE82FF;
+    --orange: #FF9600;
+    --bg: #F0F8FF;
+    --card: #FFFFFF;
+    --text: #3C3C3C;
+    --text-light: #777;
+    --border: #D0E8F5;
+    --shadow: 0 4px 0 rgba(0,0,0,0.12);
+  }
 
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: linear-gradient(135deg, #E0F5FF 0%, #F0F8FF 100%);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 16px 40px;
+  }
+
+  /* ═══ HEADER ═══ */
+  .header {
+    width: 100%;
+    max-width: 680px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .close-btn {
+    width: 36px; height: 36px;
+    border: none; background: white;
+    cursor: pointer;
+    font-size: 22px; color: var(--text-light);
+    border-radius: 8px;
+    transition: background .15s;
+    border: 2px solid var(--border);
+  }
+  .close-btn:hover { background: var(--scrum-light); }
+
+  .progress-wrap {
+    flex: 1;
+    height: 16px;
+    background: white;
+    border-radius: 999px;
+    overflow: hidden;
+    border: 2px solid var(--border);
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--scrum-blue), var(--scrum-blue-dark));
+    border-radius: 999px;
+    transition: width .5s cubic-bezier(.4,0,.2,1);
+  }
+
+  .hearts {
+    font-size: 20px;
+    letter-spacing: 2px;
+    min-width: 80px;
+    text-align: right;
+  }
+
+  /* ═══ SCREEN ═══ */
+  .screen {
+    width: 100%;
+    max-width: 680px;
+    display: none;
+    animation: fadeUp .35s ease both;
+  }
+  .screen.active { display: block; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ═══ START ═══ */
+  .start-card {
+    background: var(--card);
+    border-radius: 24px;
+    padding: 40px 32px;
+    text-align: center;
+    border: 2px solid var(--border);
+    box-shadow: var(--shadow);
+  }
+  .start-emoji { font-size: 72px; margin-bottom: 16px; }
+  .start-card h1 { font-size: 28px; font-weight: 900; margin-bottom: 10px; }
+  .start-card .sub { font-size: 16px; color: var(--text-light); line-height: 1.6; margin-bottom: 24px; }
+
+  .topics-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 28px;
+  }
+  .topic-chip {
+    background: var(--scrum-light);
+    border: 2px solid var(--scrum-blue);
+    border-radius: 12px;
+    padding: 12px 8px;
+    font-size: 13px;
+    font-weight: 700;
+    text-align: center;
+    color: #005A7A;
+  }
+  .topic-chip .chip-icon { font-size: 24px; display: block; margin-bottom: 4px; }
+
+  .mascot-row { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 24px; }
+  .mascot { font-size: 44px; flex-shrink: 0; margin-top: 2px; }
+  .speech {
+    background: #E8F6FF;
+    border: 2px solid var(--scrum-blue);
+    border-radius: 16px 16px 16px 4px;
+    padding: 14px 16px;
+    font-size: 15px;
+    font-weight: 700;
+    color: #1A3A5C;
+    line-height: 1.6;
+    flex: 1;
+  }
+
+  .btn-start {
+    width: 100%;
+    background: linear-gradient(135deg, var(--scrum-blue), var(--scrum-blue-dark));
+    color: white;
+    border: none;
+    border-radius: 16px;
+    padding: 18px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 18px;
+    font-weight: 900;
+    cursor: pointer;
+    box-shadow: 0 5px 0 #006B8F;
+    letter-spacing: .5px;
+    transition: transform .1s, box-shadow .1s;
+  }
+  .btn-start:hover { transform: translateY(-2px); box-shadow: 0 7px 0 #006B8F; }
+  .btn-start:active { transform: translateY(3px); box-shadow: 0 2px 0 #006B8F; }
+
+  /* ═══ QUESTION ═══ */
+  .q-card {
+    background: var(--card);
+    border-radius: 24px;
+    padding: 28px;
+    border: 2px solid var(--border);
+    box-shadow: var(--shadow);
+    margin-bottom: 16px;
+  }
+
+  .q-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--yellow-light);
+    border: 2px solid var(--yellow);
+    border-radius: 10px;
+    padding: 4px 12px;
+    font-size: 13px;
+    font-weight: 800;
+    color: #7A6000;
+    margin-bottom: 14px;
+  }
+
+  .q-title {
+    font-size: 20px;
+    font-weight: 800;
+    line-height: 1.4;
+    margin-bottom: 14px;
+  }
+
+  .case-box {
+    background: linear-gradient(135deg, #F0F9FF, #E0F5FF);
+    border: 2px solid var(--scrum-blue);
+    border-radius: 16px;
+    padding: 16px 18px;
+    margin-bottom: 18px;
+    font-size: 15px;
+    line-height: 1.65;
+    color: #1A4D6B;
+  }
+  .case-box strong { color: #005A7A; font-weight: 800; }
+  .case-box em { font-style: italic; color: #0099D9; font-weight: 700; }
+
+  .funny-tag {
+    display: inline-block;
+    background: #FFE4F5;
+    border: 2px solid #FF69B4;
+    border-radius: 8px;
+    padding: 2px 9px;
+    font-size: 12px;
+    font-weight: 800;
+    color: #C71585;
+    margin-bottom: 10px;
+  }
+
+  .q-prompt { font-size: 16px; font-weight: 700; margin-bottom: 14px; }
+
+  /* ═══ OPTIONS ═══ */
+  .options { display: flex; flex-direction: column; gap: 10px; }
+  .option-btn {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    background: white;
+    border: 2.5px solid var(--border);
+    border-radius: 16px;
+    padding: 14px 18px;
+    cursor: pointer;
+    font-family: 'Nunito', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    text-align: left;
+    transition: all .15s;
+    box-shadow: 0 3px 0 var(--border);
+    line-height: 1.5;
+  }
+  .option-btn:hover:not(:disabled) {
+    border-color: var(--scrum-blue);
+    background: #F0F9FF;
+    transform: translateY(-1px);
+  }
+  .opt-letter {
+    width: 30px; height: 30px;
+    border: 2.5px solid var(--border);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 14px;
+    flex-shrink: 0;
+    transition: all .15s;
+    margin-top: 1px;
+  }
+  .option-btn.selected { border-color: var(--scrum-blue); background: #E8F6FF; box-shadow: 0 3px 0 #B3DDF8; }
+  .option-btn.selected .opt-letter { background: var(--scrum-blue); border-color: var(--scrum-blue); color: white; }
+  .option-btn.correct { border-color: var(--green); background: #F0FDE4; box-shadow: 0 3px 0 #A8E063; }
+  .option-btn.correct .opt-letter { background: var(--green); border-color: var(--green); color: white; }
+  .option-btn.wrong { border-color: var(--red); background: var(--red-light); box-shadow: 0 3px 0 #FFB3B3; }
+  .option-btn.wrong .opt-letter { background: var(--red); border-color: var(--red); color: white; }
+  .option-btn:disabled { cursor: default; transform: none !important; }
+
+  /* ═══ DRAG & DROP ═══ */
+  .drag-area {
+    background: #F9FCFF;
+    border: 3px dashed var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    min-height: 180px;
+    margin-bottom: 20px;
+  }
+  .drag-item {
+    background: white;
+    border: 3px solid var(--border);
+    border-radius: 14px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    cursor: move;
+    font-weight: 600;
+    font-size: 15px;
+    transition: all .2s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .drag-item:hover { border-color: var(--scrum-blue); transform: scale(1.02); }
+  .drag-item.dragging { opacity: 0.5; }
+  .drag-icon { font-size: 20px; }
+
+  .drag-slots { display: grid; gap: 8px; margin-bottom: 20px; }
+  .drag-slot {
+    background: white;
+    border: 3px dashed var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    min-height: 56px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    transition: all .2s;
+  }
+  .drag-slot.over { background: #E0F5FF; border-color: var(--scrum-blue); border-style: solid; }
+  .drag-slot.filled { border-style: solid; border-color: var(--green); }
+  .slot-num {
+    width: 28px; height: 28px;
+    background: #F3F4F6;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  /* ═══ MATCHING ═══ */
+  .match-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+  .match-col { display: grid; gap: 10px; }
+  .match-item {
+    background: white;
+    border: 3px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all .2s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .match-item:hover:not(.matched) { border-color: var(--scrum-blue); }
+  .match-item.selected { border-color: var(--scrum-blue); background: #E8F6FF; }
+  .match-item.matched { border-color: var(--green); background: #D1FAE5; cursor: default; }
+  .match-icon { font-size: 22px; }
+
+  /* ═══ POKER CARDS ═══ */
+  .poker-cards {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .poker-card {
+    background: white;
+    border: 3px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 8px;
+    cursor: pointer;
+    text-align: center;
+    transition: all .2s;
+    position: relative;
+  }
+  .poker-card:hover:not(.selected):not(:disabled) {
+    border-color: var(--scrum-blue);
+    transform: translateY(-4px);
+  }
+  .poker-card.selected {
+    border-color: var(--scrum-blue);
+    background: #E8F6FF;
+    transform: translateY(-4px);
+  }
+  .poker-card:disabled { opacity: 0.5; cursor: default; transform: none !important; }
+  .card-value { font-size: 28px; font-weight: 900; color: var(--scrum-blue); margin-bottom: 4px; }
+  .card-label { font-size: 11px; font-weight: 700; color: var(--text-light); }
+
+  /* ═══ FEEDBACK ═══ */
+  .feedback {
+    border-radius: 16px;
+    padding: 16px 18px;
+    margin-bottom: 20px;
+    display: none;
+    animation: slideUp .25s ease both;
+  }
+  .feedback.show { display: block; }
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .feedback.correct { background: #F0FDE4; border: 2px solid var(--green); }
+  .feedback.wrong { background: var(--red-light); border: 2px solid var(--red); }
+  .fb-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 17px;
+    font-weight: 900;
+    margin-bottom: 8px;
+  }
+  .fb-icon { font-size: 24px; }
+  .correct .fb-header { color: var(--green-dark); }
+  .wrong .fb-header { color: var(--red); }
+  .fb-body { font-size: 14px; line-height: 1.6; color: var(--text); }
+  .fb-body strong { font-weight: 800; }
+
+  /* ═══ ACTIONS ═══ */
+  .action-area {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 16px;
+  }
+  .btn-check {
+    background: var(--green);
+    color: white;
+    border: none;
+    border-radius: 16px;
+    padding: 16px 36px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 17px;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 5px 0 var(--green-dark);
+    transition: all .1s;
+    letter-spacing: .5px;
+  }
+  .btn-check:hover { transform: translateY(-2px); box-shadow: 0 7px 0 var(--green-dark); }
+  .btn-check:active { transform: translateY(3px); box-shadow: 0 2px 0 var(--green-dark); }
+  .btn-check:disabled {
+    background: #D0D0D0;
+    box-shadow: 0 5px 0 #ABABAB;
+    cursor: default;
+    transform: none;
+  }
+  .btn-check.next-mode {
+    background: var(--scrum-blue);
+    box-shadow: 0 5px 0 var(--scrum-blue-dark);
+  }
+  .btn-check.next-mode:hover { box-shadow: 0 7px 0 var(--scrum-blue-dark); }
+
+  /* ═══ STREAK ═══ */
+  .streak-banner {
+    display: none;
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%,-50%) scale(.7);
+    background: var(--yellow);
+    border: 4px solid #E6B800;
+    border-radius: 24px;
+    padding: 28px 44px;
+    text-align: center;
+    z-index: 100;
+    box-shadow: 0 20px 60px rgba(0,0,0,.2);
+    animation: popIn .4s cubic-bezier(.34,1.56,.64,1) both;
+  }
+  .streak-banner.show { display: block; }
+  @keyframes popIn {
+    from { transform: translate(-50%,-50%) scale(.5); opacity: 0; }
+    to   { transform: translate(-50%,-50%) scale(1); opacity: 1; }
+  }
+  .streak-emoji { font-size: 56px; }
+  .streak-banner h2 { font-size: 28px; font-weight: 900; color: #7A5000; }
+  .streak-banner p { font-size: 16px; color: #9A6000; margin-top: 4px; }
+
+  /* ═══ RESULTS ═══ */
+  .results-card {
+    background: var(--card);
+    border-radius: 24px;
+    padding: 40px 28px;
+    text-align: center;
+    border: 2px solid var(--border);
+    box-shadow: var(--shadow);
+  }
+  .r-emoji { font-size: 80px; margin-bottom: 12px; }
+  .results-card h2 { font-size: 26px; font-weight: 900; margin-bottom: 8px; }
+  .results-card .r-sub { font-size: 16px; color: var(--text-light); margin-bottom: 28px; }
+  .stats-row { display: flex; justify-content: center; gap: 16px; margin-bottom: 28px; flex-wrap: wrap; }
+  .stat-box {
+    background: #F8F8F8;
+    border: 2px solid var(--border);
+    border-radius: 16px;
+    padding: 16px 22px;
+    min-width: 100px;
+  }
+  .stat-val { font-size: 28px; font-weight: 900; }
+  .stat-lbl { font-size: 12px; color: var(--text-light); font-weight: 700; margin-top: 2px; }
+  .stat-box.green .stat-val { color: var(--green); }
+  .stat-box.red .stat-val { color: var(--red); }
+  .stat-box.blue .stat-val { color: var(--scrum-blue); }
+
+  @media (max-width: 640px) {
+    .topics-grid { grid-template-columns: 1fr; }
+    .poker-cards { grid-template-columns: repeat(3, 1fr); }
+    .match-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header" id="header" style="display:none;">
+  <button class="close-btn" onclick="confirmExit()">✕</button>
+  <div class="progress-wrap">
+    <div class="progress-fill" id="progressBar" style="width:0%"></div>
+  </div>
+  <div class="hearts" id="heartsDisplay">❤️❤️❤️</div>
+</div>
+
+<!-- START SCREEN -->
+<div class="screen active" id="startScreen">
+  <div class="start-card">
+    <div class="start-emoji">🏃</div>
+    <h1>Scrum Детектив: Ритуалы!</h1>
+    <p class="sub">Детектив вернулся! Теперь расследуем как работают встречи в Scrum и магия Planning Poker 🃏</p>
+
+    <div class="topics-grid">
+      <div class="topic-chip"><span class="chip-icon">🗓️</span>Sprint Planning</div>
+      <div class="topic-chip"><span class="chip-icon">☀️</span>Daily Standup</div>
+      <div class="topic-chip"><span class="chip-icon">🎯</span>Sprint Review</div>
+      <div class="topic-chip"><span class="chip-icon">🔍</span>Retrospective</div>
+      <div class="topic-chip"><span class="chip-icon">🃏</span>Planning Poker</div>
+      <div class="topic-chip"><span class="chip-icon">📊</span>Story Points</div>
+    </div>
+
+    <div class="mascot-row">
+      <div class="mascot">🦉</div>
+      <div class="speech">
+        Я Дино — твой Scrum-помощник! 15 кейсов о том, как команды НА САМОМ ДЕЛЕ работают. Готов к расследованию? 🔍
+      </div>
+    </div>
+
+    <button class="btn-start" onclick="startQuiz()">🚀 Начать расследование!</button>
+  </div>
+</div>
+
+<!-- QUESTION SCREEN -->
+<div class="screen" id="questionScreen">
+  <div class="q-card">
+    <div class="q-label" id="qLabel">🗓️ Sprint Planning</div>
+    <div class="q-title" id="qTitle"></div>
+    <div id="funnyTag" style="display:none" class="funny-tag"></div>
+    <div class="case-box" id="caseBox"></div>
+    <div class="q-prompt" id="qPrompt"></div>
+    <div id="contentArea"></div>
+    <div class="feedback" id="feedbackPanel">
+      <div class="fb-header">
+        <span class="fb-icon" id="fbIcon"></span>
+        <span id="fbTitle"></span>
+      </div>
+      <div class="fb-body" id="fbBody"></div>
+    </div>
+  </div>
+  <div class="action-area">
+    <button class="btn-check" id="checkBtn" disabled onclick="handleAction()">Проверить</button>
+  </div>
+</div>
+
+<!-- RESULTS SCREEN -->
+<div class="screen" id="resultsScreen">
+  <div class="results-card">
+    <div class="r-emoji" id="resultEmoji">🏆</div>
+    <h2 id="resultTitle"></h2>
+    <p class="r-sub" id="resultSub"></p>
+    <div class="stats-row">
+      <div class="stat-box green"><div class="stat-val" id="sCorrect">0</div><div class="stat-lbl">ВЕРНО</div></div>
+      <div class="stat-box red"><div class="stat-val" id="sWrong">0</div><div class="stat-lbl">ОШИБОК</div></div>
+      <div class="stat-box blue"><div class="stat-val" id="sXP">0</div><div class="stat-lbl">XP</div></div>
+    </div>
+    <button class="btn-start" onclick="restartQuiz()">🔄 Пройти снова</button>
+  </div>
+</div>
+
+<!-- STREAK BANNER -->
+<div class="streak-banner" id="streakBanner">
+  <div class="streak-emoji" id="streakEmoji">🔥</div>
+  <h2 id="streakTitle">Серия 3!</h2>
+  <p id="streakSub">Три ответа подряд!</p>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════════════
+//  QUESTIONS
+// ════════════════════════════════════════════════════════════════
+const QUESTIONS = [
+  // SPRINT PLANNING
+  {
+    type: 'choice',
+    label: '🗓️ Sprint Planning',
+    title: 'Кейс 1: Хаос на Planning',
+    funny: '😅 Классика жанра',
+    caseText: `Команда VR-разработчиков собралась на Sprint Planning. <strong>Менеджер Игорь</strong> говорит: <em>«Я уже всё распланировал! Саша делает меню, Маша — персонажа, Петя — физику. Начинаем!»</em><br><br>Команда молча кивает. Через 2 недели: <strong>ничего не готово!</strong> Саша: <em>«Я не знал, что у меня так мало времени...»</em>`,
+    question: 'В чём главная ошибка Planning?',
+    options: [
+      'Команда должна была работать быстрее',
+      'Игорь не должен был планировать один — команда САМА выбирает сколько задач брать!',
+      'Planning не нужен вообще',
+      'Нужно было взять больше задач'
+    ],
+    correct: 1,
+    explanation: '✅ Главное правило Planning: <strong>команда САМА решает сколько задач взять!</strong> Менеджер/PO говорит ЧТО важно, но команда знает свою скорость. Игорь назначил задачи → команда не чувствует ответственности → провал!'
+  },
+
+  {
+    type: 'choice',
+    label: '🗓️ Sprint Planning',
+    title: 'Кейс 2: Слишком много!',
+    funny: '🎒 Рюкзак переполнен',
+    caseText: `Planning в разгаре. Product Owner показывает <strong>30 задач в бэклоге:</strong> «Все важные!»<br><br>Команда: <em>«Давайте возьмём все 30!»</em><br>PO: <em>«Супер! Вперёд!»</em><br><br>Через 2 недели на Review: <strong>готовы 3 задачи из 30.</strong> Остальные в процессе. Клиент недоволен.`,
+    question: 'Что пошло не так?',
+    options: [
+      'Product Owner виноват — дал слишком много задач',
+      'Команда взяла слишком много! Нужно брать только то, что РЕАЛЬНО успеешь',
+      'Спринт нужно было сделать 4 недели',
+      'Команда плохо работала'
+    ],
+    correct: 1,
+    explanation: '✅ <strong>Взяли слишком много!</strong> Лучше взять 5 задач и сделать 5, чем взять 30 и сделать 3. Planning = реалистичная оценка. Команда должна была сказать: «30 не успеем. Возьмём 10 самых важных!»'
+  },
+
+  {
+    type: 'choice',
+    label: '🗓️ Sprint Planning',
+    title: 'Кейс 3: Зачем всё это?',
+    funny: '🤔 Философский вопрос',
+    caseText: `Planning закончился. Команда взяла 8 задач. Новичок Вася спрашивает: <em>«А зачем мы это делаем? Какая цель спринта?»</em><br><br>Все молчат. Scrum Master: <em>«Ээ... Сделать эти 8 задач?»</em><br><br>Через неделю команда потерялась — не понимают, куда идут.`,
+    question: 'Чего не хватает на Planning?',
+    options: [
+      'Ничего — всё правильно',
+      'Sprint Goal — одна фраза, ДЛЯ ЧЕГО этот спринт!',
+      'Больше задач',
+      'Кофе-брейк'
+    ],
+    correct: 1,
+    explanation: '✅ <strong>Sprint Goal</strong> — девиз спринта! Не «сделать задачи 1-8», а например: <em>«К концу спринта игрок может зайти в VR и взять первый предмет!»</em> Это даёт СМЫСЛ работе. Команда понимает куда идёт!'
+  },
+
+  // DAILY STANDUP
+  {
+    type: 'choice',
+    label: '☀️ Daily Standup',
+    title: 'Кейс 4: Daily на 45 минут',
+    funny: '⏰ Время — деньги!',
+    caseText: `Каждое утро команда проводит Daily Standup. Проблема: <strong>он длится 45 минут!</strong><br><br>Петя рассказывает: <em>«Вчера я открыл проект, потом подумал о библиотеках, загуглил, нашёл на Stack Overflow, попробовал, не работает, открыл Issues...»</em> 10 минут прошло — Петя ещё не закончил!<br><br>Команда устала от Daily.`,
+    question: 'Как исправить Daily Standup?',
+    options: [
+      'Отменить Daily — он не работает',
+      'ПРАВИЛО: 15 минут МАКСИМУМ, стоя! Каждый говорит 1-2 минуты: вчера/сегодня/проблемы',
+      'Делать Daily раз в неделю',
+      'Пусть говорят сколько хотят'
+    ],
+    correct: 1,
+    explanation: '✅ Daily = <strong>15 минут СТРОГО, СТОЯ!</strong> Три вопроса: 1) Что делал вчера? 2) Что делаю сегодня? 3) Есть блокеры? Детали — после Daily отдельно! Стоять неудобно → никто не затягивает!'
+  },
+
+  {
+    type: 'match',
+    label: '☀️ Daily Standup',
+    title: 'Кейс 5: Три вопроса Daily',
+    funny: '❓ Формула успеха',
+    caseText: `На Daily Standup каждый отвечает на <strong>3 обязательных вопроса.</strong> Новичок Маша путается — не помнит какие!`,
+    question: 'Соедини вопросы с примерами ответов:',
+    pairs: [
+      { left: '❓ Что делал вчера?', leftId: 'q1', right: '«Закончил 3D-модель корабля»', rightId: 'a1' },
+      { left: '❓ Что делаю сегодня?', leftId: 'q2', right: '«Начинаю анимацию движка»', rightId: 'a2' },
+      { left: '❓ Есть блокеры?', leftId: 'q3', right: '«Жду текстуры от Пети»', rightId: 'a3' }
+    ],
+    explanation: '✅ Три вопроса — это всё! <strong>Вчера → Сегодня → Блокеры.</strong> Если блокер есть (например, ждёшь кого-то) — команда сразу слышит и помогает. Это СИНХРОНИЗАЦИЯ, не отчёт начальнику!'
+  },
+
+  {
+    type: 'choice',
+    label: '☀️ Daily Standup',
+    title: 'Кейс 6: Решаем проблему на Daily',
+    funny: '🐛 Ловушка времени',
+    caseText: `Daily Standup, 5 минут прошло. Петя: <em>«Вчера нашёл баг в коде Маши. Маш, давай сейчас разберёмся!»</em><br><br>Маша: <em>«Покажи где!»</em> Открывают код... Обсуждают... <strong>30 минут прошло!</strong> Остальные стоят и ждут.`,
+    question: 'Что нужно было сделать?',
+    options: [
+      'Правильно — проблемы решаются на Daily!',
+      'Daily НЕ для решения проблем! Записать «есть баг» → после Daily Петя и Маша разбираются отдельно',
+      'Отменить Daily',
+      'Петя не должен был говорить о баге'
+    ],
+    correct: 1,
+    explanation: '✅ <strong>Daily НЕ для решения проблем!</strong> Если нашли проблему: 1) Скажи на Daily «есть баг» 2) Договоритесь кто поможет 3) После Daily — садитесь ВДВОЁМ и решаете. Иначе 15 минут → 2 часа!'
+  },
+
+  // SPRINT REVIEW
+  {
+    type: 'choice',
+    label: '🎯 Sprint Review',
+    title: 'Кейс 7: Презентация вместо демо',
+    funny: '📊 Слайды vs реальность',
+    caseText: `Конец спринта! Команда готовится к Sprint Review с клиентом.<br><br>Саша делает <strong>презентацию на 20 слайдов</strong> с описанием: «Мы сделали меню, персонажа, физику...»<br><br>Клиент: <em>«Хорошо. А покажите как работает?»</em><br>Команда: <em>«Эээ... Не совсем готово ещё...»</em>`,
+    question: 'Что должно быть на Sprint Review?',
+    options: [
+      'Презентация — правильно!',
+      'Рабочий продукт! НЕ слайды, а реально работающее, что можно потрогать',
+      'Обсуждение планов на будущее',
+      'Код на экране'
+    ],
+    correct: 1,
+    explanation: '✅ Sprint Review = <strong>ДЕМО рабочего продукта!</strong> Не слайды, не описания — а реально работающее. «Вот меню — нажмите. Вот персонаж — подвигайте!» Если не готово → честно сказать и не показывать.'
+  },
+
+  {
+    type: 'choice',
+    label: '🎯 Sprint Review',
+    title: 'Кейс 8: Почти готово...',
+    funny: '⚠️ Опасная фраза',
+    caseText: `Sprint Review через час. Маша: <em>«У меня анимация на 90% готова! Покажу на Review!»</em><br><br>На Review анимация <strong>глючит</strong> — персонаж проваливается сквозь пол. Клиент видит баг. Неловкость...`,
+    question: 'Что нужно было сделать?',
+    options: [
+      'Показать — 90% это почти готово!',
+      'НЕ показывать! На Review только 100% готовое. «90% готово» = не готово',
+      'Соврать что это «фича»',
+      'Обвинить Петю'
+    ],
+    correct: 1,
+    explanation: '✅ <strong>Definition of Done</strong> = 100% готово! На Review показываешь только то, что: ✅ Работает ✅ Протестировано ✅ Выглядит нормально. «Почти готово» НЕ идёт на Review! Лучше честно: «Не успели, покажем в следующем спринте.»'
+  },
+
+  // RETROSPECTIVE
+  {
+    type: 'sort',
+    label: '🔍 Retrospective',
+    title: 'Кейс 9: Ритуалы по порядку',
+    funny: '📅 Что за чем?',
+    caseText: `Новый Scrum Master Лена путает порядок ритуалов в спринте. Помоги ей!<br><br>Спринт длится 2 недели (10 рабочих дней). Расставь ритуалы в правильном порядке!`,
+    question: 'Перетащи события спринта по порядку:',
+    items: [
+      { id: 'plan', text: '🗓️ Sprint Planning (День 1)', order: 0 },
+      { id: 'daily', text: '☀️ Daily Standup (Каждый день 2-9)', order: 1 },
+      { id: 'review', text: '🎯 Sprint Review (День 10)', order: 2 },
+      { id: 'retro', text: '🔍 Retrospective (После Review)', order: 3 }
+    ],
+    explanation: '✅ Порядок: 1️⃣ Planning (планируем) 2️⃣ Daily каждый день (синхронизируемся) 3️⃣ Review (показываем результат) 4️⃣ Retrospective (улучшаем процесс). Retro ВСЕГДА последняя!'
+  },
+
+  {
+    type: 'choice',
+    label: '🔍 Retrospective',
+    title: 'Кейс 10: Retro пропускают',
+    funny: '⏭️ Ошибка многих',
+    caseText: `После Sprint Review команда устала. Scrum Master: <em>«Ладно, Retro пропустим! Лучше начнём следующий спринт!»</em><br><br>Следующий спринт: <strong>те же ошибки!</strong> Daily снова по 40 минут, на Planning снова берут слишком много, на Review снова «почти готово»...`,
+    question: 'Чем опасно пропускать Retrospective?',
+    options: [
+      'Ничем — Retro не обязательна',
+      'Команда повторяет одни ошибки снова и снова! Retro = место где улучшаются',
+      'Можно делать Retro раз в 3 месяца',
+      'Retro только для больших команд'
+    ],
+    correct: 1,
+    explanation: '✅ <strong>Retro = самая важная встреча!</strong> Без неё команда не учится. Retro отвечает на 3 вопроса: 😊 Что было хорошо? 😐 Что плохо? 💡 Что улучшим? Всего 45 минут спасают от повторения ошибок в следующих 10 спринтах!'
+  },
+
+  {
+    type: 'choice',
+    label: '🔍 Retrospective',
+    title: 'Кейс 11: Product Owner на Retro',
+    funny: '🚫 Лишний гость',
+    caseText: `Команда собралась на Retrospective. Product Owner Игорь заходит: <em>«Привет! Я тоже буду!»</em><br><br>Scrum Master: <em>«Игорь, Retro только для команды...»</em><br>Игорь: <em>«Но я же часть проекта!»</em><br><br>Scrum Master настаивает — Игорь уходит обиженный.`,
+    question: 'Почему PO не приходит на Retro?',
+    options: [
+      'PO не нужен нигде',
+      'Retro = безопасное пространство для команды. Чтобы говорить ЧЕСТНО, без начальства',
+      'PO слишком занят',
+      'Это случайная традиция'
+    ],
+    correct: 1,
+    explanation: '✅ Retro = <strong>ТОЛЬКО команда!</strong> Без PO, без клиентов, без начальства. Почему? Чтобы команда могла честно сказать: «PO плохо объясняет задачи» или «Менеджер постоянно меняет приоритеты». С начальником в комнате никто не скажет правду!'
+  },
+
+  // PLANNING POKER
+  {
+    type: 'poker',
+    label: '🃏 Planning Poker',
+    title: 'Кейс 12: Оцени задачу!',
+    funny: '🎲 Игра началась',
+    caseText: `Команда играет в <strong>Planning Poker</strong> на Sprint Planning.<br><br>Задача: <em>«Сделать главное меню VR-игры с 3 кнопками: Играть, Настройки, Выход»</em><br><br>Ты — разработчик. Нужно выбрать <strong>Story Points</strong> (сложность задачи).`,
+    question: 'Какую карту ты сыграешь?',
+    cards: [
+      { value: '1', label: 'Тривиально' },
+      { value: '3', label: 'Легко' },
+      { value: '5', label: 'Средне' },
+      { value: '8', label: 'Сложно' }
+    ],
+    correct: 2, // 5
+    explanation: '✅ Правильно — <strong>5 Story Points (средне)!</strong> Меню кажется простым, но нужно: нарисовать кнопки, запрограммировать нажатия, добавить звуки, протестировать. Не 1 (слишком легко), не 8 (не так сложно). 5 — реалистично!'
+  },
+
+  {
+    type: 'choice',
+    label: '🃏 Planning Poker',
+    title: 'Кейс 13: Разные оценки',
+    funny: '🤯 Кто прав?',
+    caseText: `Planning Poker. Задача: <em>«Добавить музыку в VR-игру»</em><br><br>Открываем карты:<br><strong>Саша: 3</strong> (легко!)<br><strong>Маша: 13</strong> (сложно!)<br><strong>Петя: 5</strong> (средне)<br><br>Большой разброс! Что делать?`,
+    question: 'Как правильно поступить?',
+    options: [
+      'Взять среднее — 7 Story Points',
+      'Тот кто поставил МЕНЬШЕ и кто поставил БОЛЬШЕ — объясняют почему! Потом голосуем снова',
+      'Саша прав — он лидер команды',
+      'Бросить монетку'
+    ],
+    correct: 1,
+    explanation: '✅ <strong>Разброс = ценный разговор!</strong> Саша объясняет почему 3 (может, думает просто mp3 добавить). Маша объясняет почему 13 (знает про синхронизацию, микширование, баги). После разговора все понимают задачу лучше → голосуют снова!'
+  },
+
+  {
+    type: 'poker',
+    label: '🃏 Planning Poker',
+    title: 'Кейс 14: Специальная карта',
+    funny: '❓ Секретное оружие',
+    caseText: `Planning Poker. Задача: <em>«Интегрировать новый SDK для VR-контроллеров в приложение»</em><br><br>Ты понятия не имеешь что такое SDK и как его интегрировать! Команда ждёт твою карту...`,
+    question: 'Какую карту сыграть?',
+    cards: [
+      { value: '5', label: 'Средне' },
+      { value: '8', label: 'Сложно' },
+      { value: '?', label: 'Не понимаю' },
+      { value: '☕', label: 'Перерыв' }
+    ],
+    correct: 2, // ?
+    explanation: '✅ Карта <strong>«?» = не понимаю задачу!</strong> Это НЕ стыдно! Лучше сказать честно, чем поставить наугад. Команда объяснит что такое SDK → ты поймёшь → следующее голосование будет точнее. Карта «?» спасает от ошибок!'
+  },
+
+  {
+    type: 'choice',
+    label: '🃏 Planning Poker',
+    title: 'Кейс 15: Финал — Story Points',
+    funny: '🏆 Главный урок',
+    caseText: `Финальный вопрос детектива!<br><br>Новичок Вася спрашивает: <em>«Почему мы оцениваем в Story Points, а не в часах? «5 часов» понятнее чем «5 Story Points»!»</em>`,
+    question: 'Объясни Васе — почему Story Points?',
+    options: [
+      'Story Points — это просто традиция',
+      'Все работают с разной скоростью! Новичок тратит 8 часов, эксперт — 2 часа. Story Points = СЛОЖНОСТЬ, не время',
+      'Story Points звучат круче',
+      'Story Points = ровно 1 час'
+    ],
+    correct: 1,
+    explanation: '🏆 Финал! <strong>Story Points = сложность, не время!</strong> Задача сложностью 5 SP: новичок делает 6 часов, эксперт — 2 часа. Сложность одна — время разное! Команда оценивает сложность вместе → каждый понимает сколько у него займёт.'
+  }
+];
+
+// ════════════════════════════════════════════════════════════════
+//  STATE
+// ════════════════════════════════════════════════════════════════
+let cQ = 0, hearts = 3, correct = 0, wrong = 0, streak = 0, xp = 0;
+let answered = false, selected = -1;
+
+// Drag
+let dragItem = null, slots = [];
+
+// Match
+let matchSel = null, matchPairs = [], matchCount = 0;
+
+// Poker
+let pokerSel = -1;
+
+// ════════════════════════════════════════════════════════════════
+//  INIT
+// ════════════════════════════════════════════════════════════════
+function startQuiz() {
+  cQ = 0; hearts = 3; correct = 0; wrong = 0; streak = 0; xp = 0;
+  answered = false; selected = -1;
+  showScreen('questionScreen');
+  document.getElementById('header').style.display = 'flex';
+  render();
+  updateHeader();
+}
+
+function updateHeader() {
+  const pct = (cQ / QUESTIONS.length) * 100;
+  document.getElementById('progressBar').style.width = pct + '%';
+  document.getElementById('heartsDisplay').textContent = '❤️'.repeat(hearts) + '🖤'.repeat(3 - hearts);
+}
+
+// ════════════════════════════════════════════════════════════════
+//  RENDER
+// ════════════════════════════════════════════════════════════════
+function render() {
+  answered = false; selected = -1; pokerSel = -1;
+  const q = QUESTIONS[cQ];
+  
+  document.getElementById('qLabel').textContent = q.label;
+  document.getElementById('qTitle').textContent = q.title;
+  document.getElementById('caseBox').innerHTML = q.caseText;
+  
+  const ft = document.getElementById('funnyTag');
+  if (q.funny) { ft.textContent = q.funny; ft.style.display = 'inline-block'; }
+  else { ft.style.display = 'none'; }
+  
+  document.getElementById('qPrompt').textContent = q.question;
+  
+  const content = document.getElementById('contentArea');
+  content.innerHTML = '';
+  
+  if (q.type === 'choice') {
+    const div = document.createElement('div');
+    div.className = 'options';
+    q.options.forEach((opt, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'option-btn';
+      btn.innerHTML = `<span class="opt-letter">${String.fromCharCode(65+i)}</span><span>${opt}</span>`;
+      btn.onclick = () => pick(i);
+      div.appendChild(btn);
+    });
+    content.appendChild(div);
+  }
+  
+  else if (q.type === 'sort') {
+    const pool = document.createElement('div');
+    pool.className = 'drag-area';
+    pool.id = 'pool';
+    
+    const slotsDiv = document.createElement('div');
+    slotsDiv.className = 'drag-slots';
+    slotsDiv.id = 'slotsArea';
+    
+    content.appendChild(pool);
+    content.appendChild(slotsDiv);
+    
+    initSort(q);
+  }
+  
+  else if (q.type === 'match') {
+    const grid = document.createElement('div');
+    grid.className = 'match-grid';
+    grid.innerHTML = '<div class="match-col" id="leftCol"></div><div class="match-col" id="rightCol"></div>';
+    content.appendChild(grid);
+    initMatch(q);
+  }
+  
+  else if (q.type === 'poker') {
+    const div = document.createElement('div');
+    div.className = 'poker-cards';
+    q.cards.forEach((card, i) => {
+      const c = document.createElement('div');
+      c.className = 'poker-card';
+      c.innerHTML = `<div class="card-value">${card.value}</div><div class="card-label">${card.label}</div>`;
+      c.onclick = () => pickPoker(i);
+      div.appendChild(c);
+    });
+    content.appendChild(div);
+  }
+  
+  const fb = document.getElementById('feedbackPanel');
+  fb.className = 'feedback';
+  
+  const btn = document.getElementById('checkBtn');
+  btn.textContent = 'Проверить';
+  btn.className = 'btn-check';
+  btn.disabled = true;
+}
+
+// ════════════════════════════════════════════════════════════════
+//  INTERACTIONS
+// ════════════════════════════════════════════════════════════════
+function pick(i) {
+  if (answered) return;
+  selected = i;
+  document.querySelectorAll('.option-btn').forEach((b, idx) => b.classList.toggle('selected', idx === i));
+  document.getElementById('checkBtn').disabled = false;
+}
+
+function initSort(q) {
+  const pool = document.getElementById('pool');
+  const slotsArea = document.getElementById('slotsArea');
+  slots = q.items.map(() => null);
+  
+  const shuffled = [...q.items].sort(() => Math.random() - 0.5);
+  
+  shuffled.forEach(item => {
+    const div = document.createElement('div');
+    div.className = 'drag-item';
+    div.draggable = true;
+    div.dataset.id = item.id;
+    div.innerHTML = `<span class="drag-icon">📌</span><span>${item.text}</span>`;
+    div.ondragstart = e => { dragItem = e.target; e.target.classList.add('dragging'); };
+    div.ondragend = e => { e.target.classList.remove('dragging'); dragItem = null; };
+    pool.appendChild(div);
+  });
+  
+  q.items.forEach((_, i) => {
+    const slot = document.createElement('div');
+    slot.className = 'drag-slot';
+    slot.dataset.slot = i;
+    slot.innerHTML = `<span class="slot-num">${i+1}</span><span style="color:#9CA3AF">Перетащи сюда</span>`;
+    slot.ondragover = e => { e.preventDefault(); e.currentTarget.classList.add('over'); };
+    slot.ondragleave = e => e.currentTarget.classList.remove('over');
+    slot.ondrop = e => dropSort(e, i);
+    slotsArea.appendChild(slot);
+  });
+  
+  checkSortFilled();
+}
+
+function dropSort(e, idx) {
+  e.preventDefault();
+  e.currentTarget.classList.remove('over');
+  if (!dragItem) return;
+  
+  const slot = e.currentTarget;
+  if (slots[idx]) document.getElementById('pool').appendChild(slots[idx]);
+  slots.forEach((item, i) => { if (item === dragItem) slots[i] = null; });
+  
+  slots[idx] = dragItem;
+  slot.innerHTML = '';
+  slot.appendChild(dragItem);
+  slot.classList.add('filled');
+  
+  checkSortFilled();
+}
+
+function checkSortFilled() {
+  const filled = slots.every(s => s !== null);
+  document.getElementById('checkBtn').disabled = !filled;
+}
+
+function initMatch(q) {
+  matchSel = null;
+  matchPairs = q.pairs;
+  matchCount = 0;
+  
+  const leftCol = document.getElementById('leftCol');
+  const rightCol = document.getElementById('rightCol');
+  
+  const rightShuffled = [...q.pairs].sort(() => Math.random() - 0.5);
+  
+  q.pairs.forEach(p => {
+    const div = document.createElement('div');
+    div.className = 'match-item';
+    div.dataset.id = p.leftId;
+    div.dataset.side = 'left';
+    div.innerHTML = `<span class="match-icon">➤</span><span>${p.left}</span>`;
+    div.onclick = () => selectMatch(div, p.leftId, 'left');
+    leftCol.appendChild(div);
+  });
+  
+  rightShuffled.forEach(p => {
+    const div = document.createElement('div');
+    div.className = 'match-item';
+    div.dataset.id = p.rightId;
+    div.dataset.side = 'right';
+    div.innerHTML = `<span>${p.right}</span>`;
+    div.onclick = () => selectMatch(div, p.rightId, 'right');
+    rightCol.appendChild(div);
+  });
+  
+  document.getElementById('checkBtn').disabled = true;
+}
+
+function selectMatch(elem, id, side) {
+  if (elem.classList.contains('matched')) return;
+  
+  if (!matchSel) {
+    document.querySelectorAll('.match-item').forEach(m => m.classList.remove('selected'));
+    elem.classList.add('selected');
+    matchSel = { elem, id, side };
+  } else {
+    if (matchSel.side === side) {
+      matchSel.elem.classList.remove('selected');
+      elem.classList.add('selected');
+      matchSel = { elem, id, side };
+    } else {
+      const pair = matchPairs.find(p => 
+        (p.leftId === matchSel.id && p.rightId === id) ||
+        (p.leftId === id && p.rightId === matchSel.id)
+      );
+      
+      if (pair) {
+        matchSel.elem.classList.add('matched');
+        matchSel.elem.classList.remove('selected');
+        elem.classList.add('matched');
+        matchCount++;
+        
+        if (matchCount === matchPairs.length) {
+          document.getElementById('checkBtn').disabled = false;
+        }
+      } else {
+        matchSel.elem.classList.remove('selected');
+      }
+      matchSel = null;
+    }
+  }
+}
+
+function pickPoker(i) {
+  if (answered) return;
+  pokerSel = i;
+  document.querySelectorAll('.poker-card').forEach((c, idx) => c.classList.toggle('selected', idx === i));
+  document.getElementById('checkBtn').disabled = false;
+}
+
+// ════════════════════════════════════════════════════════════════
+//  CHECK
+// ════════════════════════════════════════════════════════════════
+function handleAction() {
+  answered ? next() : check();
+}
+
+function check() {
+  answered = true;
+  const q = QUESTIONS[cQ];
+  let ok = false;
+  
+  if (q.type === 'choice') {
+    ok = selected === q.correct;
+    document.querySelectorAll('.option-btn').forEach((btn, i) => {
+      btn.disabled = true;
+      if (i === q.correct) btn.classList.add('correct');
+      if (i === selected && !ok) btn.classList.add('wrong');
+    });
+  }
+  
+  else if (q.type === 'sort') {
+    const userOrder = slots.map(item => item.dataset.id);
+    const correctOrder = q.items.map(item => item.id);
+    ok = JSON.stringify(userOrder) === JSON.stringify(correctOrder);
+    document.querySelectorAll('.drag-item').forEach(item => item.draggable = false);
+  }
+  
+  else if (q.type === 'match') {
+    ok = matchCount === matchPairs.length;
+  }
+  
+  else if (q.type === 'poker') {
+    ok = pokerSel === q.correct;
+    document.querySelectorAll('.poker-card').forEach((c, i) => {
+      c.disabled = true;
+      if (i === q.correct) c.style.borderColor = '#58CC02';
+      if (i === pokerSel && !ok) c.style.borderColor = '#FF4B4B';
+    });
+  }
+  
+  if (ok) {
+    streak++;
+    correct++;
+    xp += 10 + (streak >= 3 ? 5 : 0);
+    if (streak === 3 || streak === 5) showStreak(streak);
+  } else {
+    streak = 0;
+    wrong++;
+    hearts = Math.max(0, hearts - 1);
+    shakeCard();
+  }
+  
+  showFeedback(ok, q.explanation);
+  updateHeader();
+  
+  const btn = document.getElementById('checkBtn');
+  btn.textContent = 'Продолжить →';
+  btn.className = 'btn-check next-mode';
+  btn.disabled = false;
+}
+
+function showFeedback(ok, text) {
+  const fb = document.getElementById('feedbackPanel');
+  fb.className = 'feedback show ' + (ok ? 'correct' : 'wrong');
+  document.getElementById('fbIcon').textContent = ok ? '🎉' : '💡';
+  document.getElementById('fbTitle').textContent = ok ? 'Правильно!' : 'Не совсем...';
+  document.getElementById('fbBody').innerHTML = text;
+}
+
+function next() {
+  cQ++;
+  if (cQ >= QUESTIONS.length || hearts === 0) showResults();
+  else {
+    const s = document.getElementById('questionScreen');
+    s.style.animation = 'none'; s.offsetHeight; s.style.animation = '';
+    render();
+    updateHeader();
+  }
+}
+
+function showStreak(n) {
+  const b = document.getElementById('streakBanner');
+  document.getElementById('streakEmoji').textContent = n >= 5 ? '⚡' : '🔥';
+  document.getElementById('streakTitle').textContent = `Серия ${n}!`;
+  document.getElementById('streakSub').textContent = n >= 5 ? 'Пять правильных подряд!' : 'Три правильных подряд!';
+  b.classList.add('show');
+  setTimeout(() => b.classList.remove('show'), 1800);
+}
+
+function shakeCard() {
+  const c = document.querySelector('.q-card');
+  c.style.animation = 'shake .4s ease';
+  c.addEventListener('animationend', () => c.style.animation = '', {once:true});
+}
+
+// ════════════════════════════════════════════════════════════════
+//  RESULTS
+// ════════════════════════════════════════════════════════════════
+function showResults() {
+  showScreen('resultsScreen');
+  document.getElementById('header').style.display = 'none';
+  document.getElementById('progressBar').style.width = '100%';
+  
+  document.getElementById('sCorrect').textContent = correct;
+  document.getElementById('sWrong').textContent = wrong;
+  document.getElementById('sXP').textContent = xp;
+  
+  const pct = correct / QUESTIONS.length;
+  let emoji, title, sub;
+  
+  if (pct === 1) {
+    emoji = '🏆'; title = 'Scrum-Мастер!';
+    sub = 'Ты знаешь все ритуалы и Planning Poker на 100%!';
+  } else if (pct >= 0.8) {
+    emoji = '🎉'; title = 'Отличный результат!';
+    sub = 'Ты понимаешь Scrum! Пара деталей — и будет идеально.';
+  } else if (pct >= 0.6) {
+    emoji = '😊'; title = 'Хорошо!';
+    sub = 'Основы Scrum понятны. Повтори ритуалы!';
+  } else {
+    emoji = '💪'; title = 'Продолжай изучать!';
+    sub = 'Scrum требует практики. Пройди снова!';
+  }
+  
+  document.getElementById('resultEmoji').textContent = emoji;
+  document.getElementById('resultTitle').textContent = title;
+  document.getElementById('resultSub').textContent = sub;
+}
+
+// ════════════════════════════════════════════════════════════════
+//  UTILS
+// ════════════════════════════════════════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function restartQuiz() {
+  showScreen('startScreen');
+  document.getElementById('header').style.display = 'none';
+  document.getElementById('progressBar').style.width = '0%';
+}
+
+function confirmExit() {
+  if (confirm('Выйти? Прогресс не сохранится.')) restartQuiz();
+}
+
+// Shake animation
+const style = document.createElement('style');
+style.textContent = `@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}`;
+document.head.appendChild(style);
+</script>
+</body>
+</html>
