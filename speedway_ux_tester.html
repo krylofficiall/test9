@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎮 UX-Детектив: Тестирование SpeedWay V</title>
+<style>
+  :root {
+    --bg: #0f0f1a;
+    --card: #1a1a2e;
+    --card2: #16213e;
+    --accent: #e94560;
+    --accent2: #0f3460;
+    --neon: #00d4ff;
+    --neon2: #7b2ff7;
+    --green: #00e676;
+    --yellow: #ffd600;
+    --text: #e8eaf6;
+    --sub: #90a4ae;
+    --border: #2a2a4a;
+    --radius: 14px;
+    --shadow: 0 4px 24px rgba(0,212,255,0.08);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    min-height: 100vh;
+    padding: 0 0 60px 0;
+  }
+
+  /* HEADER */
+  .hero {
+    background: linear-gradient(135deg, #0f3460 0%, #1a1a2e 40%, #16213e 100%);
+    border-bottom: 2px solid var(--neon);
+    padding: 36px 24px 28px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 50% 0%, rgba(0,212,255,0.12) 0%, transparent 70%);
+  }
+  .hero h1 {
+    font-size: 2rem; font-weight: 800;
+    background: linear-gradient(90deg, var(--neon), var(--neon2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: -0.5px; position: relative;
+  }
+  .hero .subtitle {
+    color: var(--sub); margin-top: 8px; font-size: 1rem; position: relative;
+  }
+  .hero .badge {
+    display: inline-block; background: var(--accent);
+    color: #fff; font-size: 0.75rem; font-weight: 700;
+    padding: 3px 12px; border-radius: 20px; margin-top: 10px;
+    letter-spacing: 1px; text-transform: uppercase; position: relative;
+  }
+
+  /* LAYOUT */
+  .container { max-width: 860px; margin: 0 auto; padding: 32px 20px 0; }
+
+  /* META ROW */
+  .meta-row {
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px;
+    margin-bottom: 28px;
+  }
+
+  /* CARD */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 22px;
+    box-shadow: var(--shadow);
+    transition: border-color 0.2s;
+  }
+  .card:hover { border-color: rgba(0,212,255,0.3); }
+  .card-header {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 20px; padding-bottom: 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .card-icon { font-size: 1.5rem; }
+  .card-title { font-size: 1.1rem; font-weight: 700; color: var(--neon); }
+  .card-desc { font-size: 0.82rem; color: var(--sub); margin-top: 2px; }
+
+  /* FORM ELEMENTS */
+  label { display: block; font-size: 0.88rem; color: var(--sub); margin-bottom: 5px; font-weight: 500; }
+  input[type="text"], input[type="date"], textarea, select {
+    width: 100%; background: #12122a; border: 1px solid var(--border);
+    color: var(--text); border-radius: 8px; padding: 10px 14px;
+    font-size: 0.9rem; font-family: inherit;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+  }
+  input[type="text"]:focus, input[type="date"]:focus, textarea:focus, select:focus {
+    border-color: var(--neon); box-shadow: 0 0 0 3px rgba(0,212,255,0.1);
+  }
+  textarea { resize: vertical; min-height: 70px; }
+  select { cursor: pointer; }
+  select option { background: #12122a; }
+
+  /* RADIO GROUP */
+  .radio-group { display: flex; flex-direction: column; gap: 8px; }
+  .radio-item {
+    display: flex; align-items: center; gap: 10px;
+    background: #12122a; border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 14px; cursor: pointer;
+    transition: all 0.15s;
+  }
+  .radio-item:hover { border-color: var(--neon); background: rgba(0,212,255,0.05); }
+  .radio-item input[type="radio"] { accent-color: var(--neon); width: 16px; height: 16px; cursor: pointer; }
+  .radio-item.selected { border-color: var(--neon); background: rgba(0,212,255,0.08); }
+
+  /* CHECKBOX GROUP */
+  .check-group { display: flex; flex-direction: column; gap: 7px; }
+  .check-item {
+    display: flex; align-items: center; gap: 10px;
+    background: #12122a; border: 1px solid var(--border);
+    border-radius: 8px; padding: 9px 14px; cursor: pointer;
+    transition: all 0.15s;
+  }
+  .check-item:hover { border-color: rgba(0,212,255,0.4); }
+  .check-item input[type="checkbox"] { accent-color: var(--neon); width: 16px; height: 16px; cursor: pointer; }
+
+  /* STAR RATING */
+  .star-rating { display: flex; gap: 6px; flex-wrap: wrap; }
+  .star-btn {
+    width: 42px; height: 42px; border-radius: 8px;
+    border: 1.5px solid var(--border); background: #12122a;
+    color: var(--sub); font-size: 0.95rem; font-weight: 700;
+    cursor: pointer; transition: all 0.15s;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .star-btn:hover { border-color: var(--yellow); color: var(--yellow); background: rgba(255,214,0,0.08); }
+  .star-btn.active { border-color: var(--yellow); color: var(--yellow); background: rgba(255,214,0,0.15); }
+
+  /* EMOTION SELECTOR */
+  .emotion-row {
+    background: #12122a; border: 1px solid var(--border);
+    border-radius: 10px; padding: 14px 16px; margin-bottom: 10px;
+  }
+  .emotion-label { font-size: 0.85rem; color: var(--text); margin-bottom: 8px; font-weight: 600; }
+  .emotion-label .step-num {
+    background: var(--accent2); color: var(--neon);
+    width: 22px; height: 22px; border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 0.75rem; font-weight: 700; margin-right: 6px;
+  }
+  .emotions { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+  .emo-btn {
+    background: #1a1a2e; border: 1.5px solid var(--border);
+    border-radius: 20px; padding: 5px 12px;
+    cursor: pointer; font-size: 0.85rem; transition: all 0.15s;
+    color: var(--sub);
+  }
+  .emo-btn:hover { border-color: var(--neon); color: var(--text); }
+  .emo-btn.active-pos { border-color: var(--green); background: rgba(0,230,118,0.1); color: var(--green); }
+  .emo-btn.active-neu { border-color: var(--yellow); background: rgba(255,214,0,0.1); color: var(--yellow); }
+  .emo-btn.active-neg { border-color: var(--accent); background: rgba(233,69,96,0.1); color: var(--accent); }
+
+  /* USER STORY ITEM */
+  .story-item {
+    background: #12122a; border: 1px solid var(--border);
+    border-radius: 10px; padding: 14px 16px; margin-bottom: 10px;
+  }
+  .story-text { font-size: 0.87rem; color: var(--text); font-style: italic; margin-bottom: 10px; line-height: 1.5; }
+  .story-toggle { display: flex; gap: 10px; }
+  .toggle-btn {
+    flex: 1; padding: 8px; border-radius: 8px; border: 1.5px solid var(--border);
+    background: #1a1a2e; color: var(--sub); font-size: 0.85rem; cursor: pointer;
+    transition: all 0.15s; font-weight: 600; text-align: center;
+  }
+  .toggle-btn:hover { opacity: 0.85; }
+  .toggle-btn.yes { border-color: var(--green); background: rgba(0,230,118,0.1); color: var(--green); }
+  .toggle-btn.no { border-color: var(--accent); background: rgba(233,69,96,0.1); color: var(--accent); }
+
+  /* SECTION DIVIDER */
+  .section-sep { height: 1px; background: var(--border); margin: 18px 0; }
+
+  /* FIELD ROW */
+  .field-row { margin-bottom: 14px; }
+  .field-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+
+  /* SAVE BUTTON */
+  .save-wrap { text-align: center; padding: 30px 0 10px; }
+  .save-btn {
+    background: linear-gradient(135deg, #0f3460, #e94560);
+    color: #fff; border: none; border-radius: 12px;
+    padding: 16px 48px; font-size: 1.05rem; font-weight: 700;
+    cursor: pointer; letter-spacing: 0.5px;
+    box-shadow: 0 4px 24px rgba(233,69,96,0.3);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .save-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(233,69,96,0.45); }
+  .save-btn:active { transform: translateY(0); }
+
+  /* TOAST */
+  #toast {
+    position: fixed; bottom: 30px; right: 30px;
+    background: var(--green); color: #000; font-weight: 700;
+    padding: 12px 24px; border-radius: 10px; font-size: 0.95rem;
+    opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 999;
+  }
+  #toast.show { opacity: 1; }
+
+  /* PROGRESS BAR */
+  .progress-wrap { margin-bottom: 28px; }
+  .progress-label { font-size: 0.8rem; color: var(--sub); margin-bottom: 6px; display: flex; justify-content: space-between; }
+  .progress-bar { height: 5px; background: var(--border); border-radius: 10px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--neon), var(--neon2)); border-radius: 10px; transition: width 0.4s; }
+
+  /* RESPONSIVE */
+  @media (max-width: 600px) {
+    .meta-row { grid-template-columns: 1fr; }
+    .field-row-2 { grid-template-columns: 1fr; }
+    .hero h1 { font-size: 1.4rem; }
+    .star-btn { width: 34px; height: 34px; }
+  }
+
+  /* SECTION PILL */
+  .section-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(0,212,255,0.08); border: 1px solid rgba(0,212,255,0.2);
+    color: var(--neon); font-size: 0.75rem; font-weight: 700;
+    padding: 3px 10px; border-radius: 20px; margin-bottom: 12px;
+    text-transform: uppercase; letter-spacing: 0.8px;
+  }
+
+  .new-story-wrap { margin-top: 14px; }
+  .add-story-btn {
+    background: transparent; border: 1.5px dashed var(--border);
+    color: var(--sub); border-radius: 8px; padding: 10px 16px;
+    font-size: 0.85rem; cursor: pointer; width: 100%;
+    transition: all 0.15s; font-family: inherit;
+  }
+  .add-story-btn:hover { border-color: var(--neon); color: var(--neon); }
+
+  .custom-story { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+  .custom-story textarea { min-height: 52px; font-size: 0.85rem; }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>🎮 UX-Детектив: SpeedWay V</h1>
+  <p class="subtitle">Профессиональный лист тестирования VR-игры</p>
+  <span class="badge">Тестирование продукта</span>
+</div>
+
+<div class="container">
+
+  <!-- PROGRESS -->
+  <div class="progress-wrap">
+    <div class="progress-label"><span>Прогресс заполнения</span><span id="progress-pct">0%</span></div>
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+  </div>
+
+  <!-- META -->
+  <div class="meta-row">
+    <div class="field-row" style="margin:0">
+      <label>👤 Твоё имя</label>
+      <input type="text" id="meta-name" placeholder="Напиши своё имя..." oninput="updateProgress()">
+    </div>
+    <div class="field-row" style="margin:0">
+      <label>📅 Дата</label>
+      <input type="date" id="meta-date" oninput="updateProgress()">
+    </div>
+    <div class="field-row" style="margin:0">
+      <label>🎮 Игра</label>
+      <input type="text" id="meta-game" value="SpeedWay V" oninput="updateProgress()">
+    </div>
+  </div>
+
+  <!-- BLOCK 1: USER PERSONA -->
+  <div class="card" id="block-persona">
+    <div class="card-header">
+      <span class="card-icon">👤</span>
+      <div>
+        <div class="card-title">Блок 1: User Persona</div>
+        <div class="card-desc">Подходит ли игра для нашего пользователя?</div>
+      </div>
+    </div>
+
+    <div class="section-pill">🎯 Наша персона: Максим, 12 лет — школьник, любит игры</div>
+
+    <div class="field-row">
+      <label>🕹️ Управление в игре</label>
+      <div class="radio-group" id="rg-control">
+        <label class="radio-item"><input type="radio" name="control" value="simple" onclick="updateProgress()"> 😊 Простое — Максим поймёт за 1 минуту</label>
+        <label class="radio-item"><input type="radio" name="control" value="medium" onclick="updateProgress()"> 😐 Среднее — нужно 5 минут чтобы разобраться</label>
+        <label class="radio-item"><input type="radio" name="control" value="hard" onclick="updateProgress()"> 😤 Сложное — Максим запутается</label>
+      </div>
+    </div>
+
+    <div class="field-row">
+      <label>🔥 Насколько интересно Максиму?</label>
+      <div class="radio-group">
+        <label class="radio-item"><input type="radio" name="interest" value="yes" onclick="updateProgress()"> 🤩 Да, очень! Будет играть каждый день</label>
+        <label class="radio-item"><input type="radio" name="interest" value="ok" onclick="updateProgress()"> 🙂 Нормально, пару раз поиграет</label>
+        <label class="radio-item"><input type="radio" name="interest" value="no" onclick="updateProgress()"> 😑 Нет, быстро надоест</label>
+      </div>
+    </div>
+
+    <div class="field-row">
+      <label>⚠️ Есть ли проблемы/страхи?</label>
+      <div class="check-group">
+        <label class="check-item"><input type="checkbox" id="fear-dizzy" onchange="updateProgress()"> 🤢 Укачивает в VR</label>
+        <label class="check-item"><input type="checkbox" id="fear-hard" onchange="updateProgress()"> 🤯 Слишком сложно</label>
+        <label class="check-item"><input type="checkbox" id="fear-scary" onchange="updateProgress()"> 😱 Страшно / некомфортно</label>
+        <label class="check-item"><input type="checkbox" id="fear-none" onchange="updateProgress()"> ✅ Всё ок, проблем нет</label>
+      </div>
+    </div>
+
+    <div class="field-row">
+      <label>🎯 ИТОГ: Подходит ли игра для Максима?</label>
+      <div class="radio-group">
+        <label class="radio-item"><input type="radio" name="persona-fit" value="yes" onclick="updateProgress()"> ✅ ДА, отлично подходит!</label>
+        <label class="radio-item"><input type="radio" name="persona-fit" value="partial" onclick="updateProgress()"> 🤔 Частично (нужны улучшения)</label>
+        <label class="radio-item"><input type="radio" name="persona-fit" value="no" onclick="updateProgress()"> ❌ НЕТ, не подходит</label>
+      </div>
+    </div>
+
+    <div class="field-row" style="margin-bottom:0">
+      <label>✍️ Почему так считаешь? (1-2 предложения)</label>
+      <textarea id="persona-reason" placeholder="Напиши объяснение..." oninput="updateProgress()"></textarea>
+    </div>
+  </div>
+
+  <!-- BLOCK 2: CJM -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-icon">🗺️</span>
+      <div>
+        <div class="card-title">Блок 2: Customer Journey Map</div>
+        <div class="card-desc">Эмоции игрока на каждом этапе пути</div>
+      </div>
+    </div>
+
+    <div id="cjm-stages"></div>
+
+    <div class="section-sep"></div>
+    <div class="field-row-2">
+      <div>
+        <label>😤 Этап с САМОЙ БОЛЬШОЙ ПРОБЛЕМОЙ</label>
+        <select id="cjm-worst" onchange="updateProgress()">
+          <option value="">— выбери этап —</option>
+          <option>1. Надевает VR-шлем</option>
+          <option>2. Главное меню</option>
+          <option>3. Выбор трассы / машины</option>
+          <option>4. Старт гонки (первые 30 сек)</option>
+          <option>5. Середина гонки</option>
+          <option>6. Финиш</option>
+          <option>7. Снимает шлем</option>
+        </select>
+      </div>
+      <div>
+        <label>🌟 Этап где было КРУЧЕ ВСЕГО</label>
+        <select id="cjm-best" onchange="updateProgress()">
+          <option value="">— выбери этап —</option>
+          <option>1. Надевает VR-шлем</option>
+          <option>2. Главное меню</option>
+          <option>3. Выбор трассы / машины</option>
+          <option>4. Старт гонки (первые 30 сек)</option>
+          <option>5. Середина гонки</option>
+          <option>6. Финиш</option>
+          <option>7. Снимает шлем</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- BLOCK 3: USER STORIES -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-icon">📝</span>
+      <div>
+        <div class="card-title">Блок 3: User Stories</div>
+        <div class="card-desc">Отметь: есть ли эта функция в игре?</div>
+      </div>
+    </div>
+
+    <div id="stories-list"></div>
+
+    <div class="new-story-wrap">
+      <div class="card-title" style="font-size:0.88rem; margin-bottom:10px; color:var(--sub)">💡 Добавь свои User Stories</div>
+      <div class="custom-story" id="custom-stories">
+        <textarea class="custom-story-field" placeholder='Напиши: "Как [кто], я хочу [что], чтобы [зачем]"' oninput="updateProgress()"></textarea>
+      </div>
+      <button class="add-story-btn" onclick="addStory()">+ Добавить ещё User Story</button>
+    </div>
+  </div>
+
+  <!-- BLOCK 4: GENERAL -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-icon">⭐</span>
+      <div>
+        <div class="card-title">Блок 4: Общая оценка</div>
+        <div class="card-desc">Что понравилось и что нет</div>
+      </div>
+    </div>
+
+    <div class="field-row">
+      <label>✅ Что понравилось? (минимум 3 пункта, каждый с новой строки)</label>
+      <textarea id="likes" placeholder="1. Крутое ощущение скорости&#10;2. Красивая графика&#10;3. ..." rows="5" oninput="updateProgress()"></textarea>
+    </div>
+    <div class="field-row">
+      <label>❌ Что НЕ понравилось? (минимум 3 пункта)</label>
+      <textarea id="dislikes" placeholder="1. Нет обучения для новичков&#10;2. Непонятно куда ехать&#10;3. ..." rows="5" oninput="updateProgress()"></textarea>
+    </div>
+    <div class="field-row-2">
+      <div>
+        <label>🔴 Самая большая ПРОБЛЕМА в игре</label>
+        <textarea id="main-problem" placeholder="Опиши главную проблему..." rows="3" oninput="updateProgress()"></textarea>
+      </div>
+      <div>
+        <label>🏆 Самая крутая ФИШКА в игре</label>
+        <textarea id="main-win" placeholder="Опиши лучшую фичу..." rows="3" oninput="updateProgress()"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- BLOCK 5: IDEAS -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-icon">💡</span>
+      <div>
+        <div class="card-title">Блок 5: Твои идеи для улучшения</div>
+        <div class="card-desc">Ты — главный дизайнер! Что бы ты изменил?</div>
+      </div>
+    </div>
+    <div class="field-row">
+      <label>Идея 1</label>
+      <textarea id="idea1" placeholder="Например: добавить туториал на 2 минуты..." oninput="updateProgress()"></textarea>
+    </div>
+    <div class="field-row">
+      <label>Идея 2</label>
+      <textarea id="idea2" placeholder="Например: добавить стрелки-навигаторы на трассе..." oninput="updateProgress()"></textarea>
+    </div>
+    <div class="field-row">
+      <label>Идея 3</label>
+      <textarea id="idea3" placeholder="Ещё одна крутая идея..." oninput="updateProgress()"></textarea>
+    </div>
+    <div class="field-row" style="margin-bottom:0">
+      <label>💫 Бонус-идея</label>
+      <textarea id="idea4" placeholder="Самая смелая идея (даже если кажется нереальной)..." oninput="updateProgress()"></textarea>
+    </div>
+  </div>
+
+  <!-- BLOCK 6: FINAL SCORE -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-icon">🎯</span>
+      <div>
+        <div class="card-title">Блок 6: Итоговая оценка</div>
+        <div class="card-desc">Финальный вердикт UX-детектива</div>
+      </div>
+    </div>
+
+    <div class="field-row">
+      <label>🎮 Оценка игры от 1 до 10</label>
+      <div class="star-rating" id="score-btns">
+        <button class="star-btn" onclick="setScore(1)">1</button>
+        <button class="star-btn" onclick="setScore(2)">2</button>
+        <button class="star-btn" onclick="setScore(3)">3</button>
+        <button class="star-btn" onclick="setScore(4)">4</button>
+        <button class="star-btn" onclick="setScore(5)">5</button>
+        <button class="star-btn" onclick="setScore(6)">6</button>
+        <button class="star-btn" onclick="setScore(7)">7</button>
+        <button class="star-btn" onclick="setScore(8)">8</button>
+        <button class="star-btn" onclick="setScore(9)">9</button>
+        <button class="star-btn" onclick="setScore(10)">10</button>
+      </div>
+    </div>
+
+    <div class="field-row">
+      <label>📢 Порекомендуешь ли другу?</label>
+      <div class="radio-group">
+        <label class="radio-item"><input type="radio" name="recommend" value="yes" onclick="updateProgress()"> ✅ ДА, точно порекомендую!</label>
+        <label class="radio-item"><input type="radio" name="recommend" value="maybe" onclick="updateProgress()"> 🤔 Может быть</label>
+        <label class="radio-item"><input type="radio" name="recommend" value="no" onclick="updateProgress()"> ❌ НЕТ, не порекомендую</label>
+      </div>
+    </div>
+
+    <div class="field-row" style="margin-bottom:0">
+      <label>🗣️ Одним предложением — твоё мнение об игре</label>
+      <textarea id="summary" placeholder="Напиши своё финальное мнение..." rows="2" oninput="updateProgress()"></textarea>
+    </div>
+  </div>
+
+  <!-- SAVE -->
+  <div class="save-wrap">
+    <button class="save-btn" onclick="saveReport()">💾 Сохранить отчёт в TXT</button>
+  </div>
+
+</div>
+
+<div id="toast">✅ Отчёт сохранён!</div>
+
+<script>
+// ─── DATA ───────────────────────────────────────────────────────────────────
+const CJM_STAGES = [
+  { id: 'cjm1', label: 'Надевает VR-шлем', emoji: '🥽' },
+  { id: 'cjm2', label: 'Главное меню / Заставка', emoji: '📱' },
+  { id: 'cjm3', label: 'Выбор трассы / машины', emoji: '🏎️' },
+  { id: 'cjm4', label: 'Старт гонки (первые 30 сек)', emoji: '🚦' },
+  { id: 'cjm5', label: 'Середина гонки', emoji: '🏁' },
+  { id: 'cjm6', label: 'Финиш', emoji: '🏆' },
+  { id: 'cjm7', label: 'Снимает шлем', emoji: '😮' },
+];
+
+const EMOTIONS = [
+  { label: '😄 Восторг!', type: 'pos' },
+  { label: '😊 Хорошо', type: 'pos' },
+  { label: '😐 Нейтрально', type: 'neu' },
+  { label: '😤 Неудобно', type: 'neg' },
+  { label: '😰 Запутался', type: 'neg' },
+  { label: '😞 Разочарован', type: 'neg' },
+];
+
+const STORIES = [
+  { id: 'us1', text: '"Как новичок, я хочу простое управление, чтобы не тратить 10 минут на обучение"' },
+  { id: 'us2', text: '"Как игрок, я хочу туториал/обучение, чтобы научиться за 1 минуту"' },
+  { id: 'us3', text: '"Как игрок, я хочу видеть куда ехать (стрелки, знаки), чтобы не теряться"' },
+  { id: 'us4', text: '"Как игрок, я хочу выбирать машину, чтобы было разнообразие"' },
+  { id: 'us5', text: '"Как игрок, я хочу таблицу рекордов, чтобы соревноваться с друзьями"' },
+];
+
+let selectedScore = 0;
+const cjmSelected = {};
+const storyStatus = {};
+
+// ─── INIT ────────────────────────────────────────────────────────────────────
+window.onload = () => {
+  document.getElementById('meta-date').value = new Date().toISOString().split('T')[0];
+  buildCJM();
+  buildStories();
+  updateProgress();
+};
+
+function buildCJM() {
+  const wrap = document.getElementById('cjm-stages');
+  CJM_STAGES.forEach((s, i) => {
+    const div = document.createElement('div');
+    div.className = 'emotion-row';
+    div.innerHTML = `
+      <div class="emotion-label"><span class="step-num">${i+1}</span>${s.emoji} ${s.label}</div>
+      <div class="emotions" id="em-${s.id}">
+        ${EMOTIONS.map(e => `<button class="emo-btn" onclick="selectEmo('${s.id}','${e.label}','${e.type}',this)" type="button">${e.label}</button>`).join('')}
+      </div>
+      <textarea id="note-${s.id}" placeholder="Заметка: что произошло на этом этапе?" style="min-height:44px;font-size:0.83rem;" oninput="updateProgress()"></textarea>
+    `;
+    wrap.appendChild(div);
+  });
+}
+
+function buildStories() {
+  const wrap = document.getElementById('stories-list');
+  STORIES.forEach(s => {
+    const div = document.createElement('div');
+    div.className = 'story-item';
+    div.innerHTML = `
+      <div class="story-text">${s.text}</div>
+      <div class="story-toggle">
+        <button class="toggle-btn" id="yes-${s.id}" onclick="toggleStory('${s.id}','yes')" type="button">✅ Есть в игре</button>
+        <button class="toggle-btn" id="no-${s.id}" onclick="toggleStory('${s.id}','no')" type="button">❌ Нет в игре</button>
+      </div>
+    `;
+    wrap.appendChild(div);
+  });
+}
+
+// ─── INTERACTIONS ────────────────────────────────────────────────────────────
+function selectEmo(stageId, label, type, btn) {
+  document.querySelectorAll(`#em-${stageId} .emo-btn`).forEach(b => {
+    b.className = 'emo-btn';
+  });
+  btn.classList.add(`active-${type}`);
+  cjmSelected[stageId] = label;
+  updateProgress();
+}
+
+function toggleStory(id, val) {
+  storyStatus[id] = val;
+  const yes = document.getElementById(`yes-${id}`);
+  const no = document.getElementById(`no-${id}`);
+  yes.className = 'toggle-btn' + (val === 'yes' ? ' yes' : '');
+  no.className = 'toggle-btn' + (val === 'no' ? ' no' : '');
+  updateProgress();
+}
+
+function setScore(n) {
+  selectedScore = n;
+  document.querySelectorAll('#score-btns .star-btn').forEach((b, i) => {
+    b.classList.toggle('active', i < n);
+  });
+  updateProgress();
+}
+
+function addStory() {
+  const wrap = document.getElementById('custom-stories');
+  const ta = document.createElement('textarea');
+  ta.className = 'custom-story-field';
+  ta.placeholder = 'Как [кто], я хочу [что], чтобы [зачем]';
+  ta.style.minHeight = '52px';
+  ta.style.fontSize = '0.85rem';
+  ta.oninput = updateProgress;
+  wrap.appendChild(ta);
+}
+
+// ─── PROGRESS ────────────────────────────────────────────────────────────────
+function updateProgress() {
+  let filled = 0, total = 12;
+  if (document.getElementById('meta-name').value.trim()) filled++;
+  if (document.querySelector('input[name="control"]:checked')) filled++;
+  if (document.querySelector('input[name="interest"]:checked')) filled++;
+  if (document.querySelector('input[name="persona-fit"]:checked')) filled++;
+  if (document.getElementById('persona-reason').value.trim()) filled++;
+  if (Object.keys(cjmSelected).length >= 3) filled++;
+  if (Object.keys(storyStatus).length >= 3) filled++;
+  if (document.getElementById('likes').value.trim()) filled++;
+  if (document.getElementById('dislikes').value.trim()) filled++;
+  if (document.getElementById('idea1').value.trim()) filled++;
+  if (selectedScore > 0) filled++;
+  if (document.getElementById('summary').value.trim()) filled++;
+  const pct = Math.round((filled / total) * 100);
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-pct').textContent = pct + '%';
+}
+
+// ─── SAVE ─────────────────────────────────────────────────────────────────────
+function getRadio(name) {
+  const el = document.querySelector(`input[name="${name}"]:checked`);
+  return el ? el.value : '—';
+}
+function getChecks(ids) {
+  return ids.map(id => {
+    const el = document.getElementById(id);
+    return el && el.checked ? el.parentElement.textContent.trim() : null;
+  }).filter(Boolean).join(', ') || '—';
+}
+function val(id) { const el=document.getElementById(id); return el?el.value.trim():''; }
+
+function saveReport() {
+  const lines = [];
+  const sep = '═'.repeat(60);
+  const dash = '─'.repeat(60);
+
+  lines.push(sep);
+  lines.push('  🎮 ОТЧЁТ ТЕСТИРОВАНИЯ VR-ИГРЫ');
+  lines.push(sep);
+  lines.push(`Игра:    ${val('meta-game')}`);
+  lines.push(`Имя:     ${val('meta-name') || '—'}`);
+  lines.push(`Дата:    ${val('meta-date') || '—'}`);
+  lines.push('');
+
+  lines.push(dash);
+  lines.push('БЛОК 1: USER PERSONA');
+  lines.push(dash);
+  const controlMap = {simple:'Простое 😊', medium:'Среднее 😐', hard:'Сложное 😤'};
+  const interestMap = {yes:'Очень интересно 🤩', ok:'Нормально 🙂', no:'Не интересно 😑'};
+  const fitMap = {yes:'ДА, подходит ✅', partial:'Частично 🤔', no:'НЕ подходит ❌'};
+  lines.push(`Управление:          ${controlMap[getRadio('control')] || '—'}`);
+  lines.push(`Интерес:             ${interestMap[getRadio('interest')] || '—'}`);
+  lines.push(`Страхи/проблемы:     ${getChecks(['fear-dizzy','fear-hard','fear-scary','fear-none'])}`);
+  lines.push(`Подходит для Максима: ${fitMap[getRadio('persona-fit')] || '—'}`);
+  lines.push(`Обоснование:`);
+  lines.push(`  ${val('persona-reason') || '—'}`);
+  lines.push('');
+
+  lines.push(dash);
+  lines.push('БЛОК 2: CUSTOMER JOURNEY MAP');
+  lines.push(dash);
+  CJM_STAGES.forEach((s, i) => {
+    const emo = cjmSelected[s.id] || '—';
+    const note = val(`note-${s.id}`);
+    lines.push(`Этап ${i+1}: ${s.emoji} ${s.label}`);
+    lines.push(`  Эмоция: ${emo}`);
+    if (note) lines.push(`  Заметка: ${note}`);
+  });
+  lines.push('');
+  lines.push(`Проблемный этап:  ${val('cjm-worst') || '—'}`);
+  lines.push(`Лучший этап:      ${val('cjm-best') || '—'}`);
+  lines.push('');
+
+  lines.push(dash);
+  lines.push('БЛОК 3: USER STORIES');
+  lines.push(dash);
+  STORIES.forEach((s, i) => {
+    const st = storyStatus[s.id];
+    const icon = st === 'yes' ? '✅ ЕСТЬ' : st === 'no' ? '❌ НЕТ' : '— не отмечено';
+    lines.push(`US${i+1}: ${icon}`);
+    lines.push(`  ${s.text}`);
+  });
+  lines.push('');
+  lines.push('Новые User Stories от тестировщика:');
+  document.querySelectorAll('.custom-story-field').forEach((ta, i) => {
+    if (ta.value.trim()) lines.push(`  ${i+1}. ${ta.value.trim()}`);
+  });
+  lines.push('');
+
+  lines.push(dash);
+  lines.push('БЛОК 4: ОБЩАЯ ОЦЕНКА');
+  lines.push(dash);
+  lines.push('✅ ЧТО ПОНРАВИЛОСЬ:');
+  (val('likes')||'—').split('\n').forEach(l => lines.push(`  ${l}`));
+  lines.push('');
+  lines.push('❌ ЧТО НЕ ПОНРАВИЛОСЬ:');
+  (val('dislikes')||'—').split('\n').forEach(l => lines.push(`  ${l}`));
+  lines.push('');
+  lines.push(`Главная проблема:  ${val('main-problem') || '—'}`);
+  lines.push(`Лучшая фишка:      ${val('main-win') || '—'}`);
+  lines.push('');
+
+  lines.push(dash);
+  lines.push('БЛОК 5: ИДЕИ ДЛЯ УЛУЧШЕНИЯ');
+  lines.push(dash);
+  ['idea1','idea2','idea3','idea4'].forEach((id, i) => {
+    if (val(id)) lines.push(`${i+1}. ${val(id)}`);
+  });
+  lines.push('');
+
+  lines.push(dash);
+  lines.push('БЛОК 6: ИТОГОВАЯ ОЦЕНКА');
+  lines.push(dash);
+  const recMap = {yes:'ДА, порекомендую ✅', maybe:'Может быть 🤔', no:'НЕТ ❌'};
+  lines.push(`Оценка игры:      ${selectedScore > 0 ? selectedScore + '/10' : '—'}`);
+  lines.push(`Рекомендация:     ${recMap[getRadio('recommend')] || '—'}`);
+  lines.push(`Мнение одной строкой:`);
+  lines.push(`  ${val('summary') || '—'}`);
+  lines.push('');
+  lines.push(sep);
+  lines.push('  🎮 Отчёт создан в приложении UX-Детектив: SpeedWay V');
+  lines.push(sep);
+
+  const blob = new Blob([lines.join('\n')], { type: 'text/plain;charset=utf-8' });
+  const a = document.createElement('a');
+  const name = val('meta-name') ? val('meta-name').replace(/\s+/g,'_') : 'tester';
+  a.href = URL.createObjectURL(blob);
+  a.download = `SpeedWayV_Отчёт_${name}_${val('meta-date') || 'report'}.txt`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+
+  const toast = document.getElementById('toast');
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2500);
+}
+</script>
+</body>
+</html>
